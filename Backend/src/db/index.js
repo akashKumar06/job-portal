@@ -9,7 +9,7 @@ async function connectDB() {
       `\nMongoDB connected\nDB-Host: ${connectionInstance.connection.host}`
     );
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 }
 
