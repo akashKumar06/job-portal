@@ -25,6 +25,6 @@ async function uploadOnCloudinary(localFilePath) {
 }
 
 async function destoryOnCloudinary(publicId) {
-  await await cloudinary.v2.uploader.destroy(publicId);
+  await cloudinary.uploader.destroy(publicId);
 }
 export { uploadOnCloudinary, destoryOnCloudinary };

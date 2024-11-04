@@ -1,7 +1,11 @@
 import { ErrorHandler } from "../middlewares/error.middleware.js";
 import User from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+  destoryOnCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 import { sendToken } from "../utils/jwtToken.js";
+import jwt from "jsonwebtoken";
 
 async function registerUser(req, res, next) {
   try {
@@ -130,4 +134,105 @@ async function getUser(req, res, next) {
     next(error);
   }
 }
-export { registerUser, loginUser, logoutUser, getUser };
+
+async function updateProfile(req, res, next) {
+  try {
+    const newUserData = {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      address: req.body.address,
+      coverletter: req.body.coverletter,
+      niches: {
+        firstNiche: req.body.firstNiche,
+        secondNiche: req.body.secondNiche,
+        thirdNiche: req.body.thirdNiche,
+      },
+    };
+
+    const { firstNiche, secondNiche, thirdNiche } = newUserData.niches;
+    if (
+      req.user.role === "Job Seeker" &&
+      (!firstNiche || !secondNiche || !thirdNiche)
+    ) {
+      return next(
+        new ErrorHandler("Please provide all preferred niches.", 400)
+      );
+    }
+
+    if (req.files) {
+      const { avatar, resume } = req.files;
+      if (avatar) {
+        const avatarPublicId = req.user.avatar?.publicId;
+        if (avatarPublicId) {
+          await destoryOnCloudinary(avatarPublicId);
+        }
+        const avatarRes = await uploadOnCloudinary(avatar?.[0].path);
+        newUserData.avatar = {
+          publicId: avatarRes.public_id,
+          url: avatarRes.url,
+        };
+      }
+
+      if (resume) {
+        const resumePublicId = req.user.resume.publicId;
+        if (resumePublicId) {
+          await destoryOnCloudinary(resumePublicId);
+        }
+        const resumeRes = await uploadOnCloudinary(resume?.[0].path);
+        newUserData.resume = {
+          publicId: resumeRes.public_id,
+          url: resumeRes.url,
+        };
+      }
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, newUserData, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function updatePassword(req, res, next) {
+  try {
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+
+    let user = await User.findById(req.user._id);
+    const isPasswordValid = await user.isPasswordCorrect(oldPassword);
+    if (!isPasswordValid) {
+      return next(new ErrorHandler("Enter correct password.", 400));
+    }
+
+    if (newPassword !== confirmPassword) {
+      return next(
+        new ErrorHandler("new password did not matched with confirm password"),
+        400
+      );
+    }
+
+    user.password = newPassword;
+    await user.save();
+    sendToken(user, 200, res, "Password updated successfully.");
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+}
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  getUser,
+  updateProfile,
+  updatePassword,
+};

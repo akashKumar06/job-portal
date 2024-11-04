@@ -17,6 +17,8 @@ app.use(cookieParser());
 app.use(express.static("public"));
 // import routes
 import userRoutes from "./routes/user.routes.js";
-app.use("/api/v1/user", userRoutes);
+import jobRoutes from "./routes/job.routes.js";
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/jobs", jobRoutes);
 app.use(errorMiddleware);
 export default app;
