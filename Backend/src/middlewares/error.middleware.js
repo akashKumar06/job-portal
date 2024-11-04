@@ -5,7 +5,7 @@ class ErrorHandler extends Error {
   }
 }
 
-export function errorMiddleware(err, req, res, next) {
+function errorMiddleware(err, req, res, next) {
   err.statusCode = err?.statusCode || 500;
   err.message = err?.message || "Internal server error.";
 
@@ -29,9 +29,11 @@ export function errorMiddleware(err, req, res, next) {
     err = new ErrorHandler(400, message);
   }
 
-  return res.status(err?.statusCode).json({
+  return res.status(err?.statusCode || 500).json({
     success: false,
     message: err.message,
     err: err,
   });
 }
+
+export { ErrorHandler, errorMiddleware };

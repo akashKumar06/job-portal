@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema(
   {
@@ -33,8 +35,8 @@ const userSchema = new mongoose.Schema(
       minLength: [8, "Password must contain at least 8 characters."],
     },
     avatar: {
-      type: String, // cloudinary url
-      required: [true, "Please provide a profile picture."],
+      publicId: String, // cloudinary url
+      url: String,
     },
     resume: {
       publicId: String,
@@ -45,10 +47,36 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["Job Seeker", "Employeer"],
+      enum: ["Job Seeker", "Employer"],
+      required: true,
     },
   },
   { timestamps: true }
 );
 
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+      name: this.name,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY * 24 * 60 * 60 * 1000,
+    }
+  );
+};
+
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
 const User = mongoose.model("User", userSchema);
+export default User;

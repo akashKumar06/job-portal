@@ -14,6 +14,9 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
+app.use(express.static("public"));
+// import routes
+import userRoutes from "./routes/user.routes.js";
+app.use("/api/v1/user", userRoutes);
 app.use(errorMiddleware);
 export default app;
