@@ -22,7 +22,7 @@ const jobSchema = new mongoose.Schema(
     introduction: {
       type: String,
     },
-    responsibilites: {
+    responsibilities: {
       type: String,
       required: true,
     },
