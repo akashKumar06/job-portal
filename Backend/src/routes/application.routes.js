@@ -2,20 +2,36 @@ import express from "express";
 import { isAuthorized, verifyJWT } from "../middlewares/auth.middleware.js";
 import {
   postApplication,
-  getApplications,
-  updateStatus,
+  employerGetAllApplication,
+  jobSeekerGetAllApplication,
   deleteApplication,
 } from "../controllers/application.controller.js";
+import { upload } from "../middlewares/multer.middleware.js";
 const router = express.Router();
 
-router.route("/").get(verifyJWT, getApplications);
+router.get(
+  "/employer/getall",
+  verifyJWT,
+  isAuthorized("Employer"),
+  employerGetAllApplication
+);
+
+router.get(
+  "/jobseeker/getall",
+  verifyJWT,
+  isAuthorized("Job Seeker"),
+  jobSeekerGetAllApplication
+);
 router
   .route("/delete/:id")
   .delete(verifyJWT, isAuthorized("Job Seeker"), deleteApplication);
 router
   .route("/apply/:id")
-  .post(verifyJWT, isAuthorized("Job Seeker"), postApplication);
-router
-  .route("/update/:id")
-  .post(verifyJWT, isAuthorized("Employer"), updateStatus);
+  .post(
+    upload.single("resume"),
+    verifyJWT,
+    isAuthorized("Job Seeker"),
+    postApplication
+  );
+
 export default router;

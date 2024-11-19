@@ -1,5 +1,6 @@
 async function sendToken(user, statusCode, res, message) {
   const token = user.generateAccessToken();
+
   const options = {
     secure: true,
     httpOnly: true,
@@ -7,7 +8,7 @@ async function sendToken(user, statusCode, res, message) {
 
   return res
     .status(statusCode)
-    .cookie("token", token, options)
+    .cookie("token", token)
     .json({ success: true, user, message, token });
 }
 

@@ -5,7 +5,6 @@ import {
   uploadOnCloudinary,
 } from "../utils/cloudinary.js";
 import { sendToken } from "../utils/jwtToken.js";
-import jwt from "jsonwebtoken";
 
 async function registerUser(req, res, next) {
   try {
@@ -85,6 +84,7 @@ async function registerUser(req, res, next) {
 async function loginUser(req, res, next) {
   try {
     const { role, email, password } = req.body;
+
     if (!role || !email || !password) {
       return next(new ErrorHandler("All fields are required.", 400));
     }

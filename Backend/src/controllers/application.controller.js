@@ -1,96 +1,129 @@
 import { ErrorHandler } from "../middlewares/error.middleware.js";
-import Application from "../models/application.model.js";
+import { Application } from "../models/application.model.js";
 import Job from "../models/job.model.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
-async function postApplication(req, res, next) {
+export const postApplication = async (req, res, next) => {
   try {
-    const userId = req.user._id;
-    const jobId = req.params.id;
-    const isAlreadyApplied = await Application.findone({
-      applicantId: userId,
-      jobId: jobId,
+    const { id } = req.params;
+    const { name, email, phone, address, coverLetter } = req.body;
+    if (!name || !email || !phone || !address || !coverLetter) {
+      return next(new ErrorHandler("All fields are required.", 400));
+    }
+
+    const jobSeekerInfo = {
+      id: req.user._id,
+      name,
+      email,
+      phone,
+      address,
+      coverLetter,
+      role: "Job Seeker",
+    };
+
+    const jobDetails = await Job.findById(id);
+
+    if (!jobDetails) {
+      return next(new ErrorHandler("Job not found.", 404));
+    }
+
+    const isAlreadyApplied = await Application.findOne({
+      "jobInfo.jobId": id,
+      "jobSeekerInfo.id": req.user._id,
     });
     if (isAlreadyApplied) {
       return next(
-        new ErrorHandler("You have already applied to this job.", 400)
+        new ErrorHandler("You have already applied for this job.", 400)
       );
     }
-    const job = await Job.findById(jobId);
+
+    if (req.file) {
+      const cloudinaryRes = await uploadOnCloudinary(req.file.path);
+      console.log(cloudinaryRes);
+      jobSeekerInfo.resume = {
+        url: cloudinaryRes.url,
+        public_id: cloudinaryRes.public_id,
+      };
+    }
+
+    const employerInfo = {
+      id: jobDetails.createdBy,
+      role: "Employer",
+    };
+    const jobInfo = {
+      jobId: id,
+      jobTitle: jobDetails.title,
+    };
+
     const application = await Application.create({
-      applicantId: userId,
-      createdBy: job.createdBy,
-      jobId,
+      jobSeekerInfo,
+      employerInfo,
+      jobInfo,
     });
-    return res.status(200).json({
-      message: "Job applied successfully.",
+    return res.status(201).json({
       success: true,
+      message: "Application submitted.",
       application,
     });
   } catch (error) {
     next(error);
   }
-}
+};
 
-async function getApplications(req, res, next) {
-  try {
-    const role = req.user.role;
-    if (role === "Job Seeker") {
-      const applications = await Application.find({
-        applicantId: req.user._id,
-      }).populate("jobId");
-      return res.status(200).json({
-        success: true,
-        applications,
-      });
-    }
+export const employerGetAllApplication = async (req, res, next) => {
+  const { _id } = req.user;
+  const applications = await Application.find({
+    "employerInfo.id": _id,
+    "deletedBy.employer": false,
+  });
+  res.status(200).json({
+    success: true,
+    applications,
+  });
+};
 
-    if (role === "Employer") {
-      const applications = await Application.find({
-        createdBy: req.user._id,
-      }).populate("applicantId");
-      return res.status(200).json({
-        success: true,
-        applications,
-        user: req.user,
-      });
-    }
+export const jobSeekerGetAllApplication = async (req, res, next) => {
+  const { _id } = req.user;
+  const applications = await Application.find({
+    "jobSeekerInfo.id": _id,
+    "deletedBy.jobSeeker": false,
+  });
+  res.status(200).json({
+    success: true,
+    applications,
+  });
+};
 
-    return next(new ErrorHandler("Role did not match.", 400));
-  } catch (error) {
-    next(error);
+export const deleteApplication = async (req, res, next) => {
+  const { id } = req.params;
+  const application = await Application.findById(id);
+  if (!application) {
+    return next(new ErrorHandler("Application not found.", 404));
   }
-}
+  const { role } = req.user;
+  switch (role) {
+    case "Job Seeker":
+      application.deletedBy.jobSeeker = true;
+      await application.save();
+      break;
+    case "Employer":
+      application.deletedBy.employer = true;
+      await application.save();
+      break;
 
-async function updateStatus(req, res, next) {
-  try {
-    const status = req.body.status;
-    const applicationId = req.params.id;
-    const application = await Application.findByIdAndUpdate(
-      applicationId,
-      {
-        $set: { status },
-      },
-      { new: true }
-    );
-    return res.status(200).json({
-      success: true,
-      message: "Status updated successfully",
-      application,
-    });
-  } catch (error) {
-    next(error);
+    default:
+      console.log("Default case for application delete function.");
+      break;
   }
-}
-async function deleteApplication(req, res, next) {
-  try {
-    const applicationId = req.params.id;
-    await Application.findByIdAndDelete(applicationId);
-    return res.status(200).json({
-      message: "Application withdrawn successfully",
-      success: true,
-    });
-  } catch (error) {
-    next(error);
+
+  if (
+    application.deletedBy.employer === true &&
+    application.deletedBy.jobSeeker === true
+  ) {
+    await application.deleteOne();
   }
-}
-export { postApplication, getApplications, updateStatus, deleteApplication };
+  res.status(200).json({
+    success: true,
+    message: "Application Deleted.",
+  });
+};
