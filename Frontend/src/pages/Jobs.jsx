@@ -79,17 +79,6 @@ function Jobs() {
         console.log(err);
         setLoading(false);
       });
-
-    if (!user) return;
-    applicationService
-      .getApplications()
-      .then((data) => {
-        const jobIds = data.applications.flatMap(
-          (application) => application.jobId._id
-        );
-        dispatch(loadJobsApplied(jobIds));
-      })
-      .catch((err) => console.log(err));
   }, [city, niche, user]);
 
   function handleSearch() {
@@ -97,24 +86,6 @@ function Jobs() {
       .fetchAllJobs(city, niche, keyword)
       .then((data) => {
         dispatch(loadJobs(data));
-      })
-      .catch((err) => console.log(err));
-  }
-
-  function handleApplyNow(jobId, createdBy) {
-    if (!user) navigate("/login");
-
-    const application = {
-      applicantId: user._id,
-      createdBy,
-      jobId,
-    };
-
-    applicationService
-      .applyJob(application)
-      .then((data) => {
-        dispatch(apply(data.application));
-        dispatch(applyJob(data.application.jobId));
       })
       .catch((err) => console.log(err));
   }
@@ -202,18 +173,14 @@ function Jobs() {
                       <span>Posted On: </span> {job.createdAt.substring(0, 10)}
                     </p>
                     <div className="btn-wrapper">
-                      {jobsApplied.includes(job._id) ? (
-                        <button className="btn" disabled={true}>
-                          Applied
-                        </button>
-                      ) : (
-                        <button
-                          className="btn"
-                          onClick={() => handleApplyNow(job._id, job.createdBy)}
-                        >
-                          Apply Now
-                        </button>
-                      )}
+                      <button
+                        className="btn"
+                        onClick={() =>
+                          navigate(`/posts/application/${job._id}`)
+                        }
+                      >
+                        Apply Now
+                      </button>
                     </div>
                   </div>
                 );

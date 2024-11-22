@@ -4,12 +4,12 @@ class ApplicationService {
     this.apiUrl = "http://localhost:8000/api/v1/applications";
   }
 
-  async applyJob(applicant) {
+  async applyJob(applicant, id) {
     try {
-      const res = await fetch(`${this.apiUrl}/apply/${applicant.jobId}`, {
+      const res = await fetch(`${this.apiUrl}/apply/${id}`, {
         method: "POST",
         credentials: "include",
-        body: JSON.stringify(applicant),
+        body: applicant,
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.message);

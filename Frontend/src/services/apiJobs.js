@@ -1,7 +1,7 @@
 class JobsService {
   apiUrl = "";
   constructor() {
-    this.apiUrl = "http://localhost:8000/api/v1/jobs/";
+    this.apiUrl = "http://localhost:8000/api/v1/jobs";
   }
 
   async fetchAllJobs(city, niche, keyword) {
@@ -19,6 +19,18 @@ class JobsService {
     const res = await fetch(`${this.apiUrl}?${params}`);
     const data = await res.json();
     return data.jobs;
+  }
+
+  async fetchJobById(id) {
+    try {
+      const res = await fetch(`${this.apiUrl}/${id}`, {
+        credentials: "include",
+      });
+      const data = await res.json();
+      return data.job;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 

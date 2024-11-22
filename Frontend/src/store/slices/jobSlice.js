@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   jobs: [],
-  appliedTo: [],
+  job: {},
 };
 
 const jobSlice = createSlice({
@@ -12,12 +12,14 @@ const jobSlice = createSlice({
     loadJobs(state, action) {
       state.jobs = action.payload;
     },
-    userAppliedTo(state, action) {},
+    loadJob(state, action) {
+      state.job = action.payload;
+    },
   },
 });
 
 const jobReducer = jobSlice.reducer;
-export const { loadJobs } = jobSlice.actions;
+export const { loadJobs, loadJob } = jobSlice.actions;
 export default jobReducer;
 // export function fetchJobs(city = "", niche = "", keyword = "") {
 //   return async function (dispatch) {

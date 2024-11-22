@@ -18,6 +18,8 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import userService from "./services/apiUser";
 import { login } from "./store/slices/userSlice";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const dispatch = useDispatch();
@@ -44,6 +46,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
+      <ToastContainer position="top-right" theme="dark" />
     </BrowserRouter>
   );
 }
