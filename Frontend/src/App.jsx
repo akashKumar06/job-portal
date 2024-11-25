@@ -20,6 +20,12 @@ import userService from "./services/apiUser";
 import { login } from "./store/slices/userSlice";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import MyProfile from "./components/MyProfile";
+import UpdateProfile from "./components/UpdateProfile";
+import UpdatePassword from "./components/UpdatePassword";
+import MyJobs from "./components/MyJobs";
+import Applications from "./components/Applications";
+import MyApplications from "./components/MyApplications";
 
 function App() {
   const dispatch = useDispatch();
@@ -39,7 +45,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/jobs" element={<Jobs />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />}>
+          <Route index path="my-profile" element={<MyProfile />} />
+          <Route index path="update-profile" element={<UpdateProfile />} />
+          <Route index path="update-password" element={<UpdatePassword />} />
+          <Route index path="my-jobs" element={<MyJobs />} />
+          <Route index path="applications" element={<Applications />} />
+          <Route index path="my-applications" element={<MyApplications />} />
+        </Route>
         <Route path="/posts/application/:id" element={<PostApplication />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />

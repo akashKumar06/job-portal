@@ -15,5 +15,5 @@ router.route("/myJobs").get(verifyJWT, isAuthorized("Employer"), getMyJobs);
 router
   .route("/delete/:id")
   .delete(verifyJWT, isAuthorized("Employer"), deleteJob);
-router.route("/:id").get(verifyJWT, isAuthorized("Employer"), getJob);
+router.route("/:id").get(verifyJWT, getJob);
 export default router;

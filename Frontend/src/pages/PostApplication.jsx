@@ -186,7 +186,7 @@ function PostApplication() {
           />
         </div>
         <div style={{ alignItems: "flex-end" }}>
-          <button type="submit" disabled={isApplicationLoading}>
+          <button type="submit" className="btn" disabled={isApplicationLoading}>
             Apply
           </button>
         </div>
