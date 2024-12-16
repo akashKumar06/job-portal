@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import userService from "../services/apiUser";
+import { toast } from "react-toastify";
+import { login } from "../store/slices/userSlice";
 
 const niches = [
   "Web Development",
@@ -24,12 +27,21 @@ const niches = [
   "Frontend Development",
   "API Development & Integration",
 ];
+
 function UpdateProfile() {
   const { user: loggedInUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [resumePreview, setResumePreview] = useState("");
   const [resume, setResume] = useState("");
-
-  const [user, setUser] = useState(() => loggedInUser);
+  const [user, setUser] = useState({
+    name: loggedInUser.name,
+    email: loggedInUser.email,
+    phone: loggedInUser.phone,
+    address: loggedInUser.address,
+    firstNiche: loggedInUser.niches.firstNiche,
+    secondNiche: loggedInUser.niches.secondNiche,
+    thirdNiche: loggedInUser.niches.thirdNiche,
+  });
 
   function resumeHandler() {
     const file = e.target.files[0];
@@ -40,8 +52,20 @@ function UpdateProfile() {
       setResume(file);
     });
   }
+
+  function handleUpdateProfile(e) {
+    e.preventDefault();
+    userService
+      .updateProfile(user)
+      .then((data) => {
+        dispatch(login(data));
+        toast(data.message);
+      })
+      .catch((err) => toast(err.message));
+  }
+
   return (
-    <div className="account_components">
+    <form className="account_components" onSubmit={handleUpdateProfile}>
       <h3>Update Profile</h3>
       <div>
         <label htmlFor="fullName">Full Name</label>
@@ -64,7 +88,7 @@ function UpdateProfile() {
           }
         />
       </div>
-      {user.role === "Job Seeker" && (
+      {loggedInUser.role === "Job Seeker" && (
         <div
           className={{ display: "flex", flexDirectio: "column", gap: "15px" }}
         >
@@ -124,28 +148,46 @@ function UpdateProfile() {
       )}
       <div>
         <label>Phone Number</label>
-        <input type="text" value={user.phone} />
+        <input
+          type="text"
+          value={user.phone}
+          onChange={(e) =>
+            setUser((user) => ({ ...user, phone: e.target.value }))
+          }
+        />
       </div>
       <div>
         <label>Address</label>
-        <input type="text" value={user.address} />
+        <input
+          type="text"
+          value={user.address}
+          onChange={(e) =>
+            setUser((user) => ({ ...user, phone: e.target.value }))
+          }
+        />
       </div>
       <div>
         <label>Upload Resume</label>
         <input type="file" onChange={resumeHandler} />
-        {user && user.resume && (
+        {loggedInUser && loggedInUser.resume && (
           <div>
             <p>Current resume</p>
-            <Link to={user.resume.url} target="_blank" className="view-resume">
+            <Link
+              to={loggedInUser.resume.url}
+              target="_blank"
+              className="view-resume"
+            >
               View Resume
             </Link>
           </div>
         )}
       </div>
       <div className="save_chage_btn_wrapper">
-        <button className="btn">Save Changes</button>
+        <button className="btn" type="submit">
+          Save Changes
+        </button>
       </div>
-    </div>
+    </form>
   );
 }
 

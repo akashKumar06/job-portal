@@ -1,9 +1,4 @@
-import {
-  BrowserRouter,
-  createBrowserRouter,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -15,7 +10,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Footer from "./components/Footer";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import userService from "./services/apiUser";
 import { login } from "./store/slices/userSlice";
 import { ToastContainer } from "react-toastify";
@@ -26,32 +21,30 @@ import UpdatePassword from "./components/UpdatePassword";
 import MyJobs from "./components/MyJobs";
 import Applications from "./components/Applications";
 import MyApplications from "./components/MyApplications";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    userService
-      .getUser()
-      .then((data) => {
-        dispatch(login(data));
-      })
-      .catch((err) => console.log(err.message));
-  }, []);
-
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/jobs" element={<Jobs />} />
-        <Route path="/dashboard" element={<Dashboard />}>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to={"my-profile"} replace />} />
           <Route index path="my-profile" element={<MyProfile />} />
-          <Route index path="update-profile" element={<UpdateProfile />} />
-          <Route index path="update-password" element={<UpdatePassword />} />
-          <Route index path="my-jobs" element={<MyJobs />} />
-          <Route index path="applications" element={<Applications />} />
-          <Route index path="my-applications" element={<MyApplications />} />
+          <Route path="update-profile" element={<UpdateProfile />} />
+          <Route path="update-password" element={<UpdatePassword />} />
+          <Route path="my-jobs" element={<MyJobs />} />
+          <Route path="applications" element={<Applications />} />
+          <Route path="my-applications" element={<MyApplications />} />
         </Route>
         <Route path="/posts/application/:id" element={<PostApplication />} />
         <Route path="/register" element={<Register />} />

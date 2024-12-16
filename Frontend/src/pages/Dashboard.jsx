@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LuMoveRight } from "react-icons/lu";
 import MyProfile from "../components/MyProfile";
@@ -15,7 +15,7 @@ function Dashboard() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const { user } = useSelector((state) => state.user);
   function handleLogout() {}
 
   return (
@@ -24,7 +24,7 @@ function Dashboard() {
         <div className="component_header">
           <p>Dashboard</p>
           <p>
-            Welcome! <span>User</span>
+            Welcome! <span>{user.name}</span>
           </p>
         </div>
         <div className="container">

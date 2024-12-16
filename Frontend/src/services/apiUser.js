@@ -56,6 +56,24 @@ class UserService {
       throw error;
     }
   }
+
+  async updateProfile(user) {
+    try {
+      const response = await fetch(`${this.apiUrl}/profile/update`, {
+        credentials: "include",
+        body: JSON.stringify(user),
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 const userService = new UserService();

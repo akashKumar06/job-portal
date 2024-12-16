@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  isAuthenticated: false,
   user: null,
   jobsApplied: [],
 };
@@ -9,9 +10,12 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     login(state, action) {
+      state.isAuthenticated = true;
+
       state.user = action.payload.user;
     },
     logout(state, action) {
+      state.isAuthenticated = false;
       state.user = null;
     },
     loadJobsApplied(state, action) {

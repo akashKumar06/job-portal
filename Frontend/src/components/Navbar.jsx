@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 function Navbar() {
   const [show, setShow] = useState();
   const { user } = useSelector((state) => state.user);
-  console.log(user);
   return (
     <>
       <nav className={show ? "navbar show_navbar" : "navbar"}>
