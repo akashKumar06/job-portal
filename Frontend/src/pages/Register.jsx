@@ -74,7 +74,7 @@ function Register() {
         {error && <p>{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="wrapper">
-            <div className="inputTag">
+            <div>
               <label htmlFor="registerAs">Register As</label>
               <div>
                 <select
@@ -107,6 +107,7 @@ function Register() {
               </div>
             </div>
           </div>
+          className="inputTag"
           <div className="wrapper">
             <div className="inputTag">
               <label htmlFor="email">Email Address</label>

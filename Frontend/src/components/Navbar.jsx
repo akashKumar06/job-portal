@@ -9,8 +9,7 @@ function Navbar() {
     <>
       <nav className={show ? "navbar show_navbar" : "navbar"}>
         <div className="logo">
-          <img src="/logo.png" alt="logo" />
-          <h4>My JOBS</h4>
+          <img src="/myjob.png" alt="logo" />
         </div>
         <div className="links">
           <ul>

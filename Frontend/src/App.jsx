@@ -22,6 +22,7 @@ import MyJobs from "./components/MyJobs";
 import Applications from "./components/Applications";
 import MyApplications from "./components/MyApplications";
 import ProtectedRoute from "./components/ProtectedRoute";
+import JobPost from "./components/JobPost";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route index path="my-profile" element={<MyProfile />} />
           <Route path="update-profile" element={<UpdateProfile />} />
           <Route path="update-password" element={<UpdatePassword />} />
+          <Route path="new-job" element={<JobPost />} />
           <Route path="my-jobs" element={<MyJobs />} />
           <Route path="applications" element={<Applications />} />
           <Route path="my-applications" element={<MyApplications />} />

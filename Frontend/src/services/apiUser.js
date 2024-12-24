@@ -61,15 +61,30 @@ class UserService {
     try {
       const response = await fetch(`${this.apiUrl}/profile/update`, {
         credentials: "include",
-        body: JSON.stringify(user),
+        body: user,
+        method: "PUT",
+      });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updatePassword(data) {
+    try {
+      const response = await fetch(`${this.apiUrl}/password/update`, {
+        credentials: "include",
+        body: JSON.stringify(data),
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      const data = await response.json();
-      if (!data.success) throw new Error(data.message);
-      return data;
+      const res = await response.json();
+      if (!res.success) throw new Error(res.message);
+      return res;
     } catch (error) {
       throw error;
     }

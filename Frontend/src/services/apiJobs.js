@@ -32,6 +32,39 @@ class JobsService {
       console.log(error);
     }
   }
+
+  async postJob(job) {
+    try {
+      const apiRes = await fetch(`${this.apiUrl}/post`, {
+        credentials: "include",
+        method: "POST",
+        body: JSON.stringify(job),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res = await apiRes.json();
+      if (!res.success) throw new Error(res.message);
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteJob(id) {
+    console.log(id);
+    try {
+      const apiRes = await fetch(`${this.apiUrl}/delete/${id}`, {
+        credentials: "include",
+        method: "DELETE",
+      });
+      const res = await apiRes.json();
+      if (!res.success) throw new Error(res.message);
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 const jobsService = new JobsService();

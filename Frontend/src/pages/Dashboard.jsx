@@ -9,6 +9,9 @@ import JobPost from "../components/JobPost";
 import MyJobs from "../components/MyJobs";
 import Applications from "../components/Applications";
 import MyApplications from "../components/MyApplications";
+import userService from "../services/apiUser";
+import { toast } from "react-toastify";
+import { logout } from "../store/slices/userSlice";
 function Dashboard() {
   const [show, setShow] = useState(false);
   const [componentName, setComponentName] = useState("");
@@ -16,7 +19,16 @@ function Dashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
-  function handleLogout() {}
+  function handleLogout() {
+    userService
+      .logout()
+      .then((data) => {
+        dispatch(logout());
+        toast(data.message);
+        navigate("/");
+      })
+      .catch((err) => toast(err.message));
+  }
 
   return (
     <>
@@ -40,32 +52,28 @@ function Dashboard() {
               <li>
                 <NavLink to="update-password">Update Password</NavLink>
               </li>
-              {
-                /* if user is an employer */
+              {user && user.role === "Employer" && (
                 <li>
-                  <NavLink to="job/new">Post New Job</NavLink>
+                  <NavLink to="new-job">Post New Job</NavLink>
                 </li>
-              }
-              {
-                /* if user is an employer */
+              )}
+              {user && user.role === "Employer" && (
                 <li>
                   <NavLink to="my-jobs">My Jobs</NavLink>
                 </li>
-              }
+              )}
 
-              {
-                /* if user is an employer */
+              {user && user.role === "Employer" && (
                 <li>
                   <NavLink to="applications">Applications</NavLink>
                 </li>
-              }
+              )}
 
-              {
-                /* if user is job seeker */
+              {user && user.role === "Job Seeker" && (
                 <li>
                   <NavLink to="my-applications">My Applications</NavLink>
                 </li>
-              }
+              )}
 
               <li>
                 <button onClick={handleLogout}>Logout</button>

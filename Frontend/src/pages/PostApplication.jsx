@@ -194,9 +194,9 @@ function PostApplication() {
       <div className="job-details">
         <header>
           <h3>{job.title}</h3>
-          {job.personelWebsite && (
-            <Link to={job.personelWebsite.url}>
-              {job.personelWebsite.title}
+          {job.website && (
+            <Link to={job.website.url} target="_blank">
+              {job.website.title}
             </Link>
           )}
           <p>{job.location}</p>

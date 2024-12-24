@@ -43,20 +43,26 @@ function UpdateProfile() {
     thirdNiche: loggedInUser.niches.thirdNiche,
   });
 
-  function resumeHandler() {
+  function resumeHandler(e) {
     const file = e.target.files[0];
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload(() => {
+    reader.onload = () => {
       setResumePreview(reader.result);
       setResume(file);
-    });
+    };
   }
 
   function handleUpdateProfile(e) {
     e.preventDefault();
+    const userData = new FormData();
+    user.resume = resume;
+
+    for (const key in user) {
+      userData.append(key, user[key]);
+    }
     userService
-      .updateProfile(user)
+      .updateProfile(userData)
       .then((data) => {
         dispatch(login(data));
         toast(data.message);

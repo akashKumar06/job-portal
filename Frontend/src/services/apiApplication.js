@@ -19,14 +19,52 @@ class ApplicationService {
     }
   }
 
-  async getApplications() {
+  async getJobSeekerApplications() {
     try {
-      const res = await fetch(`${this.apiUrl}/`, {
+      const apiRes = await fetch(`${this.apiUrl}/jobseeker/getall`, {
         credentials: "include",
       });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message);
+      const res = await apiRes.json();
+      if (!res.success) throw new Error(res.message);
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getEmployerApplications() {
+    try {
+      const apiRes = await fetch(`${this.apiUrl}/employer/getall`, {
+        credentials: "include",
+      });
+      const res = await apiRes.json();
+      if (!res.success) throw new Error(res.message);
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getApplications(role) {
+    if (role === "Job Seeker") {
+      const data = await this.getJobSeekerApplications();
       return data;
+    }
+    return await this.getEmployerApplications();
+  }
+
+  async deleteApplication(id) {
+    try {
+      const apiRes = await fetch(`${this.apiUrl}/delete/${id}`, {
+        credentials: "include",
+        method: "DELETE",
+        headers: {
+          ContentType: "application/json",
+        },
+      });
+      const res = await apiRes.json();
+      if (!res.success) throw new Error(res.message);
+      return res;
     } catch (error) {
       throw error;
     }

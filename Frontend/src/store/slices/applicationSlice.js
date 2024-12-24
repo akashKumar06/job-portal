@@ -14,9 +14,15 @@ const applicationSlice = createSlice({
     apply(state, action) {
       state.applications.push(action.payload);
     },
+    applicationDelete(state, action) {
+      state.applications = state.applications.filter(
+        (application) => application._id !== action.payload
+      );
+    },
   },
 });
 
-export const { loadApplications, apply } = applicationSlice.actions;
+export const { loadApplications, apply, applicationDelete } =
+  applicationSlice.actions;
 const applicationReducer = applicationSlice.reducer;
 export default applicationReducer;

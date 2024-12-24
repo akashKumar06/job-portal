@@ -206,7 +206,13 @@ async function updateProfile(req, res, next) {
 async function updatePassword(req, res, next) {
   try {
     const { oldPassword, newPassword, confirmPassword } = req.body;
-
+    if (
+      [oldPassword, newPassword, confirmPassword].some(
+        (field) => !field || field.trim() === ""
+      )
+    ) {
+      return next(new ErrorHandler("All fields are required"));
+    }
     let user = await User.findById(req.user._id);
     const isPasswordValid = await user.isPasswordCorrect(oldPassword);
     if (!isPasswordValid) {
